@@ -2,8 +2,8 @@ __version__ = "1.0.0"
 __author__ = "AgriAI Team"
 
 # 공통 모듈 exports (기본 유틸리티만)
-from agri_ai_core.shared_modules.config.settings import settings, get_settings
-from agri_ai_core.log_utils.log_handlers import setup_logger
+from agri_ai_core.config import settings, get_settings
+from agri_ai_core.src.logs import setup_logger
 
 __all__ = [
     # 설정 및 유틸리티
@@ -12,8 +12,8 @@ __all__ = [
     "setup_logger",
     # 엔트리포인트 (지연 로드)
     "db_session",
-    "create_app",
     "run_streamlit",
+    "run_reflex",
 ]
 
 
@@ -24,12 +24,9 @@ __all__ = [
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 def __getattr__(name):
     if name == "db_session":
-        from agri_ai_core.database.postgres.connection import db_session
+        from agri_ai_core.src.postgresql import db_session
         return db_session
-    if name == "create_app":
-        from agri_ai_core.api.main import create_app
-        return create_app
-    if name == "run_streamlit":
-        from agri_ai_core.ui.streamlit_app.main import main
-        return main
+    if name in ("run_streamlit", "run_reflex"):
+        from agri_ai_core.main.main import app
+        return app
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
